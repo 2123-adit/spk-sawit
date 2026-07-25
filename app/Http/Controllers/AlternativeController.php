@@ -100,8 +100,9 @@ class AlternativeController extends Controller
 
     public function destroyAll()
     {
-        \App\Models\AlternativeValue::truncate();
-        \App\Models\Alternative::truncate();
+        // Use delete() instead of truncate() for SQLite compatibility
+        \App\Models\AlternativeValue::query()->delete();
+        \App\Models\Alternative::query()->delete();
 
         return redirect()->route('alternatives.index')->with('success', 'Semua data alternatif berhasil dihapus!');
     }
