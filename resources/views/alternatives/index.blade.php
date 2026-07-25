@@ -10,12 +10,24 @@
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
             </div>
-            <div>
+            <div class="flex-1">
                 <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500">Data Alternatif</h2>
                 <p class="text-sm text-slate-500">Kelola data alternatif dan nilai kriteria kelapa sawit</p>
             </div>
+            {{-- Tombol Hapus Semua Data --}}
+            <form id="form-destroy-all" action="{{ route('alternatives.destroyAll') }}" method="POST" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
+            <button type="button"
+                    onclick="if(confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data alternatif yang ada.\nTindakan ini tidak dapat dibatalkan!\n\nApakah Anda yakin ingin melanjutkan?')) { document.getElementById(\'form-destroy-all\').submit(); }"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-700 text-white font-semibold hover:from-rose-700 hover:to-red-800 shadow-md shadow-rose-500/30 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Hapus Semua Data
+            </button>
         </div>
     </div>
+
 
 
     <!-- Import Excel Panel -->

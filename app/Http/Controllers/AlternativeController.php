@@ -97,4 +97,12 @@ class AlternativeController extends Controller
     {
         return Excel::download(new AlternativesTemplateExport(), 'template_alternatif.xlsx');
     }
+
+    public function destroyAll()
+    {
+        \App\Models\AlternativeValue::truncate();
+        \App\Models\Alternative::truncate();
+
+        return redirect()->route('alternatives.index')->with('success', 'Semua data alternatif berhasil dihapus!');
+    }
 }
