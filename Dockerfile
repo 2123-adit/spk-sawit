@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
-# Enable Apache mod_rewrite (required for Laravel routing)
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
 # Update Apache DocumentRoot to point to Laravel's public directory
@@ -35,21 +35,28 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy all project files to the container
 COPY . /var/www/html
 
+# Create .env from example and generate key
+RUN cp .env.example .env
+
 # Install PHP and Node.js dependencies, then build Vite assets
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install
 RUN npm run build
 
+# Generate APP_KEY
+RUN php artisan key:generate --force
+
 # Create SQLite database file
 RUN touch database/database.sqlite
 
 # Set directory permissions for Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/.env
 
 # Create startup script to run migrations and seeders before starting the server
+# We use 'su' to run artisan commands as www-data so log files are created with correct permissions
 RUN echo '#!/bin/bash\n\
-php artisan migrate --force\n\
-php artisan db:seed --force\n\
+su -s /bin/bash www-data -c "php artisan migrate --force"\n\
+su -s /bin/bash www-data -c "php artisan db:seed --force"\n\
 # Set port dynamically based on Render environment variable\n\
 sed -i "s/Listen 80/Listen ${PORT:-80}/g" /etc/apache2/ports.conf\n\
 sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:${PORT:-80}>/g" /etc/apache2/sites-available/000-default.conf\n\
