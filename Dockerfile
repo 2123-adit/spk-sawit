@@ -57,11 +57,11 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 RUN echo '#!/bin/bash\n\
 su -s /bin/bash www-data -c "php artisan migrate --force"\n\
 su -s /bin/bash www-data -c "php artisan db:seed --force"\n\
-# Set port dynamically based on Render environment variable\n\
-sed -i "s/Listen 80/Listen ${PORT:-80}/g" /etc/apache2/ports.conf\n\
-sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:${PORT:-80}>/g" /etc/apache2/sites-available/000-default.conf\n\
 apache2-foreground\n' > /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/entrypoint.sh
+
+# Expose port 80 for Render
+EXPOSE 80
 
 # Run the entrypoint script
 CMD ["/usr/local/bin/entrypoint.sh"]
