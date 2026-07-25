@@ -23,16 +23,41 @@
         </div>
     @else
 
+    <div x-data="{ activeTab: 'keputusan' }" class="space-y-6">
+        <!-- Tab Navigation -->
+        <div class="flex flex-wrap gap-3 glass-panel p-2 rounded-2xl mb-2">
+            <button @click="activeTab = 'keputusan'" 
+                    :class="activeTab === 'keputusan' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md' : 'hover:bg-white/50 text-slate-600'"
+                    class="px-6 py-2.5 rounded-xl font-semibold transition-all text-sm flex items-center gap-2">
+                📊 Data Alternatif
+            </button>
+            <button @click="activeTab = 'bobot'" 
+                    :class="activeTab === 'bobot' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md' : 'hover:bg-white/50 text-slate-600'"
+                    class="px-6 py-2.5 rounded-xl font-semibold transition-all text-sm flex items-center gap-2">
+                ⚖️ Bobot Kriteria
+            </button>
+            <button @click="activeTab = 'normalisasi'" 
+                    :class="activeTab === 'normalisasi' ? 'bg-gradient-to-r from-indigo-500 to-blue-500 text-white shadow-md' : 'hover:bg-white/50 text-slate-600'"
+                    class="px-6 py-2.5 rounded-xl font-semibold transition-all text-sm flex items-center gap-2">
+                📐 Matriks Normalisasi
+            </button>
+        </div>
+
     <!-- Matriks Keputusan -->
-    <div class="glass-panel rounded-3xl p-6 mb-8">
+    <div x-show="activeTab === 'keputusan'" 
+         x-transition:enter="transition ease-out duration-300" 
+         x-transition:enter-start="opacity-0 translate-y-4" 
+         x-transition:enter-end="opacity-100 translate-y-0" 
+         class="glass-panel rounded-3xl p-6 mb-8" 
+         style="display: none;">
         <h3 class="font-bold text-slate-700 mb-2 flex items-center gap-2 text-lg">
             <span class="text-emerald-500">📊</span> Data Alternatif terhadap Kriteria
         </h3>
         <p class="text-sm text-slate-500 mb-6 bg-white/50 p-3 rounded-xl border border-white/60">Data ini menunjukkan nilai dari setiap alternatif (kelapa sawit) terhadap kriteria yang telah ditentukan.</p>
         
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-600">
-                <thead class="bg-white/50 text-slate-600 font-bold border-b border-white/60">
+        <div class="overflow-auto max-h-[500px] rounded-xl border border-slate-100 shadow-inner">
+            <table class="w-full text-left text-sm text-slate-600 relative">
+                <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 sticky top-0 z-10 shadow-sm">
                     <tr>
                         <th class="px-4 py-3">Alt</th>
                         @foreach($result['criterias'] as $c)
@@ -55,14 +80,19 @@
     </div>
 
     <!-- Bobot Tiap Kriteria -->
-    <div class="glass-panel rounded-3xl p-6 mb-8">
+    <div x-show="activeTab === 'bobot'" 
+         x-transition:enter="transition ease-out duration-300" 
+         x-transition:enter-start="opacity-0 translate-y-4" 
+         x-transition:enter-end="opacity-100 translate-y-0" 
+         class="glass-panel rounded-3xl p-6 mb-8" 
+         style="display: none;">
         <h3 class="font-bold text-slate-700 mb-6 flex items-center gap-2 text-lg">
             <span class="text-amber-500">⚖️</span> Bobot Tiap Kriteria
         </h3>
         
-        <div class="overflow-x-auto">
+        <div class="overflow-auto rounded-xl border border-slate-100 shadow-inner">
             <table class="w-full text-left text-sm text-slate-600">
-                <thead class="bg-white/50 text-slate-600 font-bold border-b border-white/60">
+                <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                     <tr>
                         <th class="px-4 py-3">Kode</th>
                         <th class="px-4 py-3">Kriteria</th>
@@ -91,15 +121,20 @@
     </div>
 
     <!-- Matriks Normalisasi -->
-    <div class="glass-panel rounded-3xl p-6">
+    <div x-show="activeTab === 'normalisasi'" 
+         x-transition:enter="transition ease-out duration-300" 
+         x-transition:enter-start="opacity-0 translate-y-4" 
+         x-transition:enter-end="opacity-100 translate-y-0" 
+         class="glass-panel rounded-3xl p-6" 
+         style="display: none;">
         <h3 class="font-bold text-slate-700 mb-2 flex items-center gap-2 text-lg">
             <span class="text-indigo-500">📐</span> Matriks Normalisasi
         </h3>
         <p class="text-sm text-slate-500 mb-6 bg-white/50 p-3 rounded-xl border border-white/60">Matriks yang telah dinormalisasi menggunakan persamaan akar jumlah kuadrat pada setiap kriteria.</p>
         
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-600">
-                <thead class="bg-white/50 text-slate-600 font-bold border-b border-white/60">
+        <div class="overflow-auto max-h-[500px] rounded-xl border border-slate-100 shadow-inner">
+            <table class="w-full text-left text-sm text-slate-600 relative">
+                <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 sticky top-0 z-10 shadow-sm">
                     <tr>
                         <th class="px-4 py-3">Alt</th>
                         @foreach($result['criterias'] as $c)
@@ -119,6 +154,8 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
     </div>
 
     @endif
