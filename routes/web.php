@@ -16,6 +16,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 Route::resource('criterias', CriteriaController::class);
 Route::resource('alternatives', AlternativeController::class);
+Route::post('/alternatives/import', [AlternativeController::class, 'import'])->name('alternatives.import');
+Route::get('/alternatives/template/download', [AlternativeController::class, 'downloadTemplate'])->name('alternatives.template');
 Route::get('/calculation', [CalculationController::class, 'index'])->name('calculation.index');
 Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 Route::get('/report/pdf', [ReportController::class, 'pdf'])->name('report.pdf');

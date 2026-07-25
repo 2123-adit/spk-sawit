@@ -5,11 +5,13 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     sqlite3 \
     libzip-dev \
+    libgd-dev \
     zip \
     unzip \
     curl \
     gnupg \
-    && docker-php-ext-install pdo pdo_sqlite zip
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_sqlite zip gd bcmath
 
 # Install Node.js (for Vite build)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \

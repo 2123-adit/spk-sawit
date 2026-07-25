@@ -18,8 +18,56 @@
     </div>
 
 
-    <!-- Form Tambah Data -->
+    <!-- Import Excel Panel -->
+    <div class="glass-panel rounded-3xl p-6 mb-6 border border-emerald-200/50">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-emerald-400/30">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-700">Import Data via Excel / CSV</h3>
+                <p class="text-xs text-slate-500">Upload file Excel sekaligus untuk 500 data atau lebih</p>
+            </div>
+            <div class="ml-auto">
+                <a href="{{ route('alternatives.template') }}"
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Download Template Excel
+                </a>
+            </div>
+        </div>
+
+        <form action="{{ route('alternatives.import') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
+                <div class="flex-1">
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Pilih File Excel / CSV</label>
+                    <input type="file" name="file" accept=".xlsx,.xls,.csv"
+                           class="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 bg-white/60 border border-white/60 rounded-xl p-1.5 cursor-pointer transition">
+                    @error('file')
+                        <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <button type="submit"
+                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold hover:from-emerald-600 hover:to-teal-700 shadow-md shadow-emerald-500/30 transition-all whitespace-nowrap">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Import Sekarang
+                </button>
+            </div>
+            <p class="text-xs text-slate-400 mt-2">
+                💡 Format kolom: <code class="bg-slate-100 px-1 rounded">nama_alternatif</code>, 
+                @foreach($criterias as $c)
+                    <code class="bg-slate-100 px-1 rounded">{{ strtolower($c->code) }}</code>{{ !$loop->last ? ', ' : '' }}
+                @endforeach
+            </p>
+        </form>
+    </div>
+
+    <!-- Form Tambah Data Manual -->
     <div class="glass-panel rounded-3xl p-6 mb-8">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="text-sm font-semibold text-slate-500">✏️ Atau tambah data manual satu per satu:</span>
+        </div>
         <form action="{{ route('alternatives.store') }}" method="POST">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -42,6 +90,7 @@
             </button>
         </form>
     </div>
+
 
     <!-- Tabel Data Alternatif -->
     <div class="glass-panel rounded-3xl p-6">

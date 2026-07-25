@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Alternative;
 use App\Models\AlternativeValue;
 use App\Models\Criteria;
+use App\Imports\AlternativesImport;
+use App\Exports\AlternativesTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AlternativeController extends Controller
 {
@@ -67,5 +70,31 @@ class AlternativeController extends Controller
     {
         $alternative->delete();
         return redirect()->back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ], [
+            'file.required' => 'Pilih file Excel/CSV terlebih dahulu.',
+            'file.mimes'    => 'Format file harus .xlsx, .xls, atau .csv.',
+            'file.max'      => 'Ukuran file maksimal 10 MB.',
+        ]);
+
+        $import = new AlternativesImport();
+        Excel::import($import, $request->file('file'));
+
+        $msg = "Import berhasil! {$import->importedCount} data berhasil dimasukkan.";
+        if ($import->skippedCount > 0) {
+            $msg .= " {$import->skippedCount} baris dilewati (nama kosong).";
+        }
+
+        return redirect()->route('alternatives.index')->with('success', $msg);
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new AlternativesTemplateExport(), 'template_alternatif.xlsx');
     }
 }
