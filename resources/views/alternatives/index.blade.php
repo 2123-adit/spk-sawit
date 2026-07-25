@@ -60,6 +60,10 @@
                     <code class="bg-slate-100 px-1 rounded">{{ strtolower($c->code) }}</code>{{ !$loop->last ? ', ' : '' }}
                 @endforeach
             </p>
+            <p class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
+                🔄 <strong>Nilai Rentang Otomatis:</strong> Untuk data seperti <code class="bg-amber-100 px-1 rounded">10-20</code> (misal Umur Tanaman 10-20 Tahun), sistem akan otomatis menghitung nilai tengah: <strong>(10+20)/2 = 15</strong>. Cukup tulis <code class="bg-amber-100 px-1 rounded">10-20</code> di sel Excel, sistem yang akan mengkonversinya.
+            </p>
+
         </form>
     </div>
 
