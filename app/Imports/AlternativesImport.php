@@ -69,22 +69,30 @@ class AlternativesImport implements ToCollection, WithHeadingRow
 
     /**
      * Parse a value that may be a range (e.g., "10-20") or a plain number.
+     * Supports both Western decimal format (18.24) and Indonesian format (18,24).
      * Ranges are converted to their midpoint: (min + max) / 2.
      */
     private function parseValue($raw): float
     {
         $str = trim((string) $raw);
 
-        // Remove thousands separator dots and replace comma decimals
-        $str = str_replace('.', '', $str);
-        $str = str_replace(',', '.', $str);
-
-        // Detect range format: "10-20" or "10 - 20"
+        // STEP 1: Handle range format FIRST (before any dot stripping)
+        // e.g., "10-20" or "10.5-20.5"
         if (preg_match('/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/', $str, $matches)) {
             $min = (float) $matches[1];
             $max = (float) $matches[2];
             return ($min + $max) / 2;
         }
+
+        // STEP 2: If it's already a valid Western decimal number (e.g., "18.24", "93.76", "22.3")
+        // return it directly WITHOUT stripping the dot (dot is decimal separator, NOT thousands)
+        if (is_numeric($str) && strpos($str, '.') !== false) {
+            return (float) $str;
+        }
+
+        // STEP 3: Indonesian format "15.444,71" → remove thousands dots, replace comma with dot
+        $str = str_replace('.', '', $str);
+        $str = str_replace(',', '.', $str);
 
         return is_numeric($str) ? (float) $str : 0;
     }
