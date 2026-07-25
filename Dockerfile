@@ -23,6 +23,9 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# Enable .htaccess overrides
+RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+
 # Set working directory
 WORKDIR /var/www/html
 
@@ -43,19 +46,15 @@ RUN touch database/database.sqlite
 # Set directory permissions for Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
 
-# Configure Apache to listen on Render's dynamic PORT
-RUN sed -i "s/Listen 80/Listen \${PORT}/g" /etc/apache2/ports.conf
-RUN sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:\${PORT}>/g" /etc/apache2/sites-available/000-default.conf
-
 # Create startup script to run migrations and seeders before starting the server
 RUN echo '#!/bin/bash\n\
 php artisan migrate --force\n\
 php artisan db:seed --force\n\
+# Set port dynamically based on Render environment variable\n\
+sed -i "s/Listen 80/Listen ${PORT:-80}/g" /etc/apache2/ports.conf\n\
+sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:${PORT:-80}>/g" /etc/apache2/sites-available/000-default.conf\n\
 apache2-foreground\n' > /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/entrypoint.sh
-
-# Expose Render PORT
-EXPOSE $PORT
 
 # Run the entrypoint script
 CMD ["/usr/local/bin/entrypoint.sh"]
