@@ -23,6 +23,9 @@ class AlternativesImport implements ToCollection, WithHeadingRow
 
     public function collection(Collection $rows)
     {
+        // Track names already used to handle duplicates
+        $nameCount = [];
+
         foreach ($rows as $row) {
             // Skip if name is empty
             if (empty($row['nama_alternatif'])) {
@@ -30,10 +33,20 @@ class AlternativesImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-            // Create or find the alternative by name
-            $alternative = Alternative::firstOrCreate(
-                ['name' => $row['nama_alternatif']]
-            );
+            $baseName = trim($row['nama_alternatif']);
+
+            // Make name unique: if "3 Tahun" appears more than once,
+            // name them "3 Tahun", "3 Tahun (2)", "3 Tahun (3)", etc.
+            if (!isset($nameCount[$baseName])) {
+                $nameCount[$baseName] = 1;
+                $finalName = $baseName;
+            } else {
+                $nameCount[$baseName]++;
+                $finalName = $baseName . ' (' . $nameCount[$baseName] . ')';
+            }
+
+            // Always create a NEW alternative for each row
+            $alternative = Alternative::create(['name' => $finalName]);
 
             // Insert values for each criteria
             foreach ($this->criterias as $criteria) {
@@ -43,13 +56,11 @@ class AlternativesImport implements ToCollection, WithHeadingRow
                 // Auto-convert range like "10-20" to midpoint (15)
                 $value = $this->parseValue($rawValue);
 
-                AlternativeValue::updateOrCreate(
-                    [
-                        'alternative_id' => $alternative->id,
-                        'criteria_id'    => $criteria->id,
-                    ],
-                    ['value' => $value]
-                );
+                AlternativeValue::create([
+                    'alternative_id' => $alternative->id,
+                    'criteria_id'    => $criteria->id,
+                    'value'          => $value,
+                ]);
             }
 
             $this->importedCount++;
