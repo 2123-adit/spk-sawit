@@ -69,15 +69,14 @@ class AlternativesImport implements ToCollection, WithHeadingRow
 
     /**
      * Parse a value that may be a range (e.g., "10-20") or a plain number.
-     * Supports both Western decimal format (18.24) and Indonesian format (18,24).
-     * Ranges are converted to their midpoint: (min + max) / 2.
+     * Supports both Western decimal format (18.24), Indonesian format (18,24),
+     * and handles malformed inputs like "34,4354,545" by extracting the number.
      */
     private function parseValue($raw): float
     {
         $str = trim((string) $raw);
 
         // STEP 1: Handle range format FIRST (before any dot stripping)
-        // e.g., "10-20" or "10.5-20.5"
         if (preg_match('/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/', $str, $matches)) {
             $min = (float) $matches[1];
             $max = (float) $matches[2];
@@ -85,14 +84,40 @@ class AlternativesImport implements ToCollection, WithHeadingRow
         }
 
         // STEP 2: If it's already a valid Western decimal number (e.g., "18.24", "93.76", "22.3")
-        // return it directly WITHOUT stripping the dot (dot is decimal separator, NOT thousands)
+        // return it directly WITHOUT stripping the dot.
         if (is_numeric($str) && strpos($str, '.') !== false) {
             return (float) $str;
         }
 
-        // STEP 3: Indonesian format "15.444,71" → remove thousands dots, replace comma with dot
-        $str = str_replace('.', '', $str);
-        $str = str_replace(',', '.', $str);
+        // STEP 3: Handle typical "34,5" (single comma) -> "34.5"
+        if (preg_match('/^\d+,\d+$/', $str)) {
+            return (float) str_replace(',', '.', $str);
+        }
+
+        // STEP 4: Handle Indonesian format "15.444,71" -> "15444.71"
+        // Or malformed format "34,4354,545" -> if there are multiple commas/dots,
+        // we'll remove all EXCEPT the very last one, assuming it's the decimal separator.
+        
+        // Find the position of the last comma and last dot
+        $lastComma = strrpos($str, ',');
+        $lastDot = strrpos($str, '.');
+        
+        if ($lastComma !== false || $lastDot !== false) {
+            // Determine which one is the decimal separator (the one that appears last)
+            $decimalPos = max($lastComma, $lastDot);
+            
+            // Extract the integer part and the fractional part
+            $intPart = substr($str, 0, $decimalPos);
+            $fracPart = substr($str, $decimalPos + 1);
+            
+            // Remove ALL commas and dots from the integer part
+            $intPart = str_replace([',', '.'], '', $intPart);
+            
+            $str = $intPart . '.' . $fracPart;
+        }
+
+        // Clean any remaining non-numeric characters (except minus sign and dot)
+        $str = preg_replace('/[^0-9\.-]/', '', $str);
 
         return is_numeric($str) ? (float) $str : 0;
     }

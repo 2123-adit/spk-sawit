@@ -147,7 +147,7 @@
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-4 py-3 font-medium">{{ $alt->name }}</td>
                         @foreach($result['criterias'] as $c)
-                            <td class="px-4 py-3 text-center">{{ number_format($result['normalizedMatrix'][$alt->id][$c->id] ?? 0, 4, ',', '.') }}</td>
+                            <td class="px-4 py-3 text-center">{{ number_format($result['normalizedMatrix'][$alt->id][$c->id] ?? 0, 6, ',', '.') }}</td>
                         @endforeach
                     </tr>
                     @endforeach

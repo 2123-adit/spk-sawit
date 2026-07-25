@@ -56,7 +56,7 @@
                             {{ $pref['alternative']->name }}
                         </td>
                         <td class="px-4 py-3 text-center font-mono font-semibold {{ $pref['rank'] === 1 ? 'text-amber-600' : 'text-slate-600' }}">
-                            {{ number_format($pref['yi'], 4, ',', '.') }}
+                            {{ number_format($pref['yi'], 6, ',', '.') }}
                         </td>
                         <td class="px-4 py-3 text-xs font-semibold">
                             @if($pref['rank'] === 1)
